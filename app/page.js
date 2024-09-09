@@ -7,16 +7,28 @@ export default function Home() {
   const [data, setData] = useState(null);
 
   const accessData = async () => {
-    const response = await fetch('/api/news', {
+    try {
+      const response = await fetch('http://localhost:8000/summarize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: "Breaking: Mars to Host 2028 Olympics, Says International Olympic Committee"}),
-    })
-    const data = await response.json();
-    console.log(data);
+        body: JSON.stringify({
+          text: "Breaking: Mars to Host 2028 Olympics, Says International Olympic Committee"
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      setData(data.summary);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   }
+  
   
   return (
     <Box  width="100vw" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">

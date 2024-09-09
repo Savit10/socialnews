@@ -1,12 +1,22 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from transformers import pipeline
 from newsapi import NewsApiClient
+from bs4 import BeautifulSoup
+import requests
 
 app = FastAPI()
-summarizer = pipeline("summarization", model="arpit-sri/news-sum")
 
-@app.get("/")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this to the specific domain of your Next.js app in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+summarizer = pipeline("summarization", model="arpit-sri/news-sum")
 
 class TextInput(BaseModel):
     text: str
@@ -37,16 +47,6 @@ def scrape_article(url):
     except Exception as e:
         return f"Error occurred: {e}"
 
-def summarize_text(input_data: TextInput):
-    text = input_data.text
-    
-    if not text:
-        raise HTTPException(status_code=400, detail="Text input is required")
-    
-    summary = summarizer(text, max_length=100, min_length=40, do_sample=False)
-    
-    return summary[0]['summary_text']
-
 def return_summary(urls):
     urls = get_url('business', 'us')
     results = []
@@ -60,3 +60,12 @@ def return_summary(urls):
             'summary': summary
         })
     return results
+
+@app.post("/summarize")
+async def summarize_text(input_data: TextInput):
+    try:
+        text = input_data.text
+        summary = summarizer(text, max_length=100, min_length=40, do_sample=False)
+        return {"summary": summary[0]['summary_text']}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
