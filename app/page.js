@@ -7,32 +7,14 @@ import Image from 'next/image';
 import laptopImg from './laptop.jpg';
 import newspaperImg from './newspaper.jpg';
 import { Grid } from '@mui/material';
+import { Sign } from "crypto";
+import { SignedIn } from "@clerk/nextjs";
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-
-  const [data, setData] = useState(null);
-
-  const accessData = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/summarize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: "Breaking: Mars to Host 2028 Olympics, Says International Olympic Committee"
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      setData(data.summary);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
+  const router = useRouter();
+  const handleClick = () => {
+    router.push('/news');
   }
   
   return (
@@ -167,7 +149,7 @@ export default function Home() {
                   backgroundColor: '#1b5e20', 
                 },
               }}
-              onClick={accessData}
+              onClick={handleClick}
             >
               Get Started
             </Button>
