@@ -8,6 +8,7 @@ import requests
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics.pairwise import cosine_similarity
+from typing import List
 import numpy as np
 
 app = FastAPI()
@@ -22,11 +23,7 @@ app.add_middleware(
 
 summarizer = pipeline("summarization", model="arpit-sri/news-sum")
 
-class TextInput(BaseModel):
-    text: str
-
-@app.post("/summarize")
-async def summarize_text(input_data: TextInput):
+async def summarize_text(input_data):
     try:
         text = input_data.text
         summary = summarizer(text, max_length=100, min_length=40, do_sample=False)
@@ -36,8 +33,7 @@ async def summarize_text(input_data: TextInput):
 
 def get_url(category, country):
     newsapi = NewsApiClient(api_key='2e9e4dcd8aaa426794955186ce972759')
-    top_headlines = newsapi.get_top_headlines(q='bitcoin',
-                                              category=category,
+    top_headlines = newsapi.get_top_headlines(category=category,
                                               language='en',
                                               country=country)
     urls = [article['url'] for article in top_headlines['articles']]
@@ -79,19 +75,29 @@ def get_recommendations(user_topics):
             top_5_recommendations.append(topics)
     return top_5_recommendations
 
-def return_summary(urls):
-    urls = get_url('business', 'us')
+
+class CategoryInput(BaseModel):
+    text: List[str]
+
+@app.post("/summarize")
+def return_summary(categories: CategoryInput):
     results = []
-    user_categories = [] 
+    user_categories = categories.text 
+    print(user_categories)
     recommended_topics = get_recommendations(user_categories)
-    for url in urls:
-        article = scrape_article(url)
-        title = {article['title']}
-        content = {article['content']}
-        summary = summarize_text(content)
-        results.append({
-            'title': title,
-            'summary': summary
-        })
+    for topic in recommended_topics:
+        urls = get_url(topic.islower(), 'ca')
+        for url in urls:
+            article = scrape_article(url)
+            title = {article['title']}
+            content = {article['content']}
+            summary = summarize_text(content)
+            results.append({
+                'title': title,
+                'summary': summary
+            })
     return results
 
+@app.get("/")
+def test_request():
+    return {"message": "Hello World"}
