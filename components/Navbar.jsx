@@ -1,11 +1,13 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { SignedIn, SignedOut } from "@clerk/nextjs";
+import TemporaryDrawer from './TemporaryDrawer';
 
 export default function Navbar(props) {
     return (
-        <AppBar position="static" sx={{ backgroundColor: '#388e3c', width: '100%' }}> 
+        <AppBar sx={{ backgroundColor: '#388e3c', width: '100%' }}> 
             <Toolbar>
+                <TemporaryDrawer />
                 <Typography 
                   variant="h6" 
                   component="div" 
