@@ -1,6 +1,9 @@
 "use client"
 import React, {useState} from "react";
 import { Box, Button } from "@mui/material";
+import Typography from '@mui/material/Typography';
+import Navbar from "@/components/Navbar";
+
 
 export default function Home() {
 
@@ -29,13 +32,21 @@ export default function Home() {
     }
   }
   
-  
   return (
-    <Box  width="100vw" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-      <Button variant="contained" color="primary" onClick={accessData}> Generate Text </Button>
-      <Box>
-        {data && <p>{data}</p>}
-      </Box>
-    </Box>
+    <div>
+        <Box
+            sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', }}>
+            <Navbar text="SocialNews" />
+            <Box>
+              <Typography variant="h4" gutterBottom sx={{ fontSize: '4rem', fontWeight:'bold', marginTop: "10px"  }}>
+                  Welcome to SocialNews!
+              </Typography>
+              <Typography variant="body1" sx={{ maxWidth: '800px', marginTop: '16px', fontSize: '1.5rem' }}>
+                  {data ? data : "Click the button below to get the latest news!"}
+              </Typography>
+              <Button  variant="contained"  color="primary"  sx={{ marginTop: '24px', fontSize: '1.5rem' }} onClick={accessData}>Get News</Button>
+            </Box>
+        </Box>
+      </div>
   );
 }

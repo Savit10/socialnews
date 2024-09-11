@@ -25,6 +25,15 @@ summarizer = pipeline("summarization", model="arpit-sri/news-sum")
 class TextInput(BaseModel):
     text: str
 
+@app.post("/summarize")
+async def summarize_text(input_data: TextInput):
+    try:
+        text = input_data.text
+        summary = summarizer(text, max_length=100, min_length=40, do_sample=False)
+        return {"summary": summary[0]['summary_text']}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 def get_url(category, country):
     newsapi = NewsApiClient(api_key='2e9e4dcd8aaa426794955186ce972759')
     top_headlines = newsapi.get_top_headlines(q='bitcoin',
@@ -86,11 +95,3 @@ def return_summary(urls):
         })
     return results
 
-@app.post("/summarize")
-async def summarize_text(input_data: TextInput):
-    try:
-        text = input_data.text
-        summary = summarizer(text, max_length=100, min_length=40, do_sample=False)
-        return {"summary": summary[0]['summary_text']}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
