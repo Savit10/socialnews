@@ -44,7 +44,7 @@ export default function Home() {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          backgroundColor: '#e8f5e9', 
+          backgroundColor: '#e8f5e9', // Light Green Background
           minHeight: '100vh', 
         }}
       >
